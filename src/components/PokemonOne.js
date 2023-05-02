@@ -21,9 +21,8 @@ export default function PokemonOne() {
     //https://pokeapi.co/api/v2/pokemon
 
     let PokemonFunction = async (res) => {
-        let pokemonList = [] ;
 
-       await res.map(async(item) => {
+       let promises =  res.map(async(item) => {
             let result = await axios.get(item.url);          
             let  pokemon = {
                 id:result.data.id,
@@ -33,16 +32,17 @@ export default function PokemonOne() {
                 image:result.data.sprites.front_default,
                 ability : result.data.abilities.length > 1 ? result.data.abilities[0].ability.name + " " + result.data.abilities[1].ability.name : result.data.abilities[0].ability.name,
                 atribute: result.data.types.length > 1 ? result.data.types[0].type.name + " " + result.data.types[1].type.name :result.data.types[0].type.name  ,
-            }
-            pokemonList.push(pokemon)
-            setData(pokemonList)
+            };
+            return pokemon
         })
+        let pokemonList = await Promise.all(promises)
+        setData(pokemonList)
 
     }
      
     useEffect(()=>{
         FetchData();
-        alert('click to pokemon box to see pokemon details ')
+        // alert('click to pokemon box to see pokemon details ')
     },[]);
 
     let passDetail = (props) => {
@@ -56,14 +56,14 @@ export default function PokemonOne() {
         <div className='containerComponents'>
                 {/* abc{data.length} */}
          
-            <div className='detailComponent'>
+            {/* <div className='detailComponent'>
             <Detail data={pass} 
             image={pass.image} 
             id={pass.id} name={pass.name}
              height={pass.height} weight={pass.weight} 
               ability={pass.ability}
               atribute={pass.atribute}/>
-            </div>
+            </div> */}
 
             <div className='displayComponent'>
 
@@ -71,8 +71,21 @@ export default function PokemonOne() {
             list.name.toLowerCase().includes(search)).map((list) =>
             <div className="container" key={list.id} onClick={() => passDetail(list)}>
                 <div className="index_image" >
-                {/* <li className='index' >{list.id}</li> */}
                 <li className='image'><img src={list.image} alt="" /></li>
+            </div>
+            <div className="data">
+                <h3>{list.name}</h3>
+              <span>weight</span> : {list.weight}
+                <br />
+              <span>height</span> : {list.height}
+              <br />
+              <span>abilities</span> : {list.ability}
+              <br />
+              <span>attribute</span> : {list.atribute}
+               <br />
+
+
+
             </div>
             </div>
             )}
